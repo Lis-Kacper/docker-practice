@@ -1,0 +1,26 @@
+
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: oracle-xe
+    platform: linux/amd64
+    ports:
+      - "1521:1521"  # port bazy danych
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+      ORACLE_USERNAME: ${ORACLE_USERNAME}
+      APP_USER: ${APP_USER}
+      APP_USER_PASSWORD: ${APP_USER_PASSWORD}
+      ORACLE_DATABASE: ${ORACLE_DATABASE}
+    volumes:
+      - oracle_data:/opt/oracle/oradata
+      - ./db/init:/container-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM dual;' | sqlplus -s / as sysdba || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 20
+
+
+volumes:
+  oracle_data:
